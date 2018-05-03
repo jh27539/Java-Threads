@@ -4,7 +4,7 @@ import java.util.Random;
 
 import static java.lang.Integer.parseInt;
 
-class generatorThread extends Thread{
+class producerThread extends Thread{
     public void start(){
     }
 
@@ -22,22 +22,27 @@ class generatorThread extends Thread{
     }
 }
 
+class consumerThread extends Thread{
+    public void start(){}
+
+}
+
 public class JavaThreads {
 
     public static void main(String[] args) {
 
         Queue<Integer> numberQueue = new LinkedList<>();
-        //Queue<Thread> threadQueue = new LinkedList<>();
+        Queue<Thread> threadQueue = new LinkedList<>();
 
         // Adds elements to queue
         for (int i=0; i<args.length; i++)
             numberQueue.add(parseInt(args[i]));
 
-        generatorThread myThread = new generatorThread();
-        myThread.start();
+        producerThread producer = new producerThread();
+        producer.start();
 
         for(int i=0; i<5; i++)
-            numberQueue.add(myThread.generateNumber(parseInt(args[0])));
+            numberQueue.add(producer.generateNumber(parseInt(args[0])));
 
         // Display contents of the queue.
         System.out.println("Elements of queue: " + numberQueue);
