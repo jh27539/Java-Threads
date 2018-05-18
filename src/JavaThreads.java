@@ -1,5 +1,3 @@
-import sun.jvm.hotspot.debugger.win32.coff.DebugVC50SymbolTypes;
-
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -47,8 +45,8 @@ public class JavaThreads {
              ((LinkedList<Thread>) threadQueue).getLast().start();
          }
 
-         System.out.println("MAX_THREADS = " + MAX_THREADS);
-         System.out.println("Interval = " + interval);
+         System.out.println("Thread Pool: " + MAX_THREADS);
+         System.out.println("Interval   : " + interval);
 
          producer.start();
 
