@@ -1,62 +1,82 @@
+import sun.jvm.hotspot.debugger.win32.coff.DebugVC50SymbolTypes;
+
 import java.util.LinkedList;
 import java.util.Queue;
-import java.util.Random;
 
 import static java.lang.Integer.parseInt;
-
-class producerThread extends Thread{
-    public void start(){
-    }
-
-    public int generateNumber(int interval){
-        Random rando = new Random();
-        int  n = rando.nextInt();
-
-        System.out.println("Thread " + Thread.currentThread().getId() + ": Value " + n);
-        try {
-            Thread.sleep(interval);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        return n;
-    }
-}
-
-class consumerThread extends Thread{
-    public void start(){}
-
-}
 
 public class JavaThreads {
 
     public static void main(String[] args) {
 
-        Queue<Integer> numberQueue = new LinkedList<>();
+        //Check arguments
+        numArgs(args.length);
+        checkArgs(args[0]);
+        checkArgs(args[1]);
+
+        int MAX_THREADS = parseInt(args[0]);
+        int interval = parseInt(args[1]);
+
         Queue<Thread> threadQueue = new LinkedList<>();
+        final Processor processor = new Processor();
 
-        // Adds elements to queue
-        for (int i=0; i<args.length; i++)
-            numberQueue.add(parseInt(args[i]));
+         Thread producer = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    processor.produce(interval);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
 
-        producerThread producer = new producerThread();
-        producer.start();
+         //Create pool of threads and add them to queue
 
-        for(int i=0; i<5; i++)
-            numberQueue.add(producer.generateNumber(parseInt(args[0])));
+         for(int i=0; i<MAX_THREADS;i++){
+             threadQueue.add( new Thread(new Runnable() {
+                 @Override
+                 public void run() {
+                     try {
+                         processor.consume();
+                     } catch (InterruptedException e) {
+                         e.printStackTrace();
+                     }
+                 }
+             }));
+             ((LinkedList<Thread>) threadQueue).getLast().start();
+         }
 
-        // Display contents of the queue.
-        System.out.println("Elements of queue: " + numberQueue);
-        //System.out.println(q);
+         System.out.println("MAX_THREADS = " + MAX_THREADS);
+         System.out.println("Interval = " + interval);
 
-        //int removedele = q.remove();
-        //System.out.println("removed element: " + removedele);
+         producer.start();
 
-        // To view the head of queue
-        int head = numberQueue.peek();
-        System.out.println("head of queue: " + head);
+    }
 
-        int size = numberQueue.size();
-        System.out.println("Size of queue: " + size);
+    private static void numArgs(int size){
+        if(size!=2){
+            System.out.println("Invalid number of arguments!");
+            System.out.println("Please use <numThreads> <interval> as inputs");
+            System.exit(0);
+        }
+    }
+
+    private static void checkArgs(String input) {
+
+        try{
+            parseInt(input);
+        } catch (NumberFormatException e){
+            System.out.println(input + " is an invalid input");
+            System.out.println("Please use <numThreads> <interval> as inputs");
+            System.exit(0);
+        }
+
+        if(!(parseInt(input)>0)) {
+            System.out.println("Inputs must be greater than 0");
+            System.exit(0);
+        }
+
 
     }
 }
